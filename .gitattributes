@@ -1,0 +1,2 @@
+# Example line in .gitattributes you might see:
+# *.glb filter=lfs diff=lfs merge=lfs -text
