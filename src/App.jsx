@@ -8,23 +8,38 @@ import { Canvas, applyProps, useFrame,  } from '@react-three/fiber'
 import { PerformanceMonitor, AccumulativeShadows, RandomizedLight, Environment, Lightformer, Float, useGLTF, OrbitControls} from '@react-three/drei'
 import { LayerMaterial, Color, Depth } from 'lamina'
 
+function Aventador(props) {
+  // Set the base path for the GLTF model and its associated textures
+  const modelPath = '/aventador/scene.gltf';
+
+  // Prepend the base path to the textures in the GLTF model
+  useGLTF.preload(modelPath);
+
+  // Load the model
+  const { scene, nodes, materials } = useGLTF(modelPath);
+
+  // Apply the necessary effects post-load
+  useLayoutEffect(() => {
+    Object.values(nodes).forEach((node) => {
+      if (node.isMesh) {
+        node.receiveShadow = true;
+        node.castShadow = true;
+      }
+    });
+  }, [nodes, materials]);
+
+  return <primitive object={scene} {...props} />;
+}
+
+
 export function App() {
   const [degraded, degrade] = useState(false)
-  const [showLights, setShowLights] = useState(true);
-
-  // Toggle to show/hide lights
-  const toggleLights = () => setShowLights(!showLights);
 
   return (
     <Canvas shadows camera={{ position: [5, 0, 15], fov: 25 }}>
-      {showLights && (
-        <>
-          <spotLight position={[0, 15, 0]} angle={0.3} penumbra={1} castShadow intensity={2} shadow-bias={-0.0001} />
-          <ambientLight intensity={0.5} />
-        </>
-      )}
+      <spotLight position={[0, 15, 0]} angle={0.3} penumbra={1} castShadow intensity={2} shadow-bias={-0.0001} />
       <ambientLight intensity={0.5} />
-      <Porsche scale={1.6} position={[-0.5, -1.2, 0]} rotation={[0, Math.PI / 5, 0]} />
+      <Aventador scale={1.6} position={[-0.5, -1.2, 0]} rotation={[0, Math.PI / 5, 0]} />
       <AccumulativeShadows position={[0, -1.16, 0]} frames={100} alphaTest={0.9} scale={10}>
         <RandomizedLight amount={8} radius={10} ambient={0.5} position={[1, 5, -1]} />
       </AccumulativeShadows>
